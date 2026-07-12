@@ -53,7 +53,7 @@ function Register() {
     const { confirmPassword, ...payload } = formData;
     const result = await register(payload);
     if (result.success) {
-      toast.success('Account created successfully!');
+      toast.success('Welcome to TransitOps!');
       navigate('/dashboard');
     } else {
       toast.error(result.message || 'Registration failed');
@@ -65,8 +65,8 @@ function Register() {
       <div className="login-card register-card">
         <div className="login-header">
           <FiTruck className="login-logo" />
-          <h1>TMS</h1>
-          <p>Create your account</p>
+        <h1>TransitOps</h1>
+          <p>Create your TransitOps account</p>
         </div>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-field">

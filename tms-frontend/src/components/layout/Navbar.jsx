@@ -4,7 +4,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { useI18n } from '../../i18n/I18nProvider';
 import { useIntl } from 'react-intl';
 import { FiLogOut, FiUser, FiMoon, FiSun, FiGlobe } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
 import NotificationBell from './NotificationBell';
 import '../../styles/layout.css';
 
@@ -41,11 +40,11 @@ function Navbar() {
         <button className="btn-theme-toggle" onClick={toggleTheme} title={theme === 'light' ? 'Dark mode' : 'Light mode'}>
           {theme === 'light' ? <FiMoon /> : <FiSun />}
         </button>
-        <Link to="/profile" className="navbar-user" style={{ cursor: 'pointer' }}>
-          <FiUser />
-          <span>{user?.fullName || user?.username}</span>
-          <span className="navbar-role-badge">{user?.role}</span>
-        </Link>
+       <div className="navbar-user">
+  <FiUser />
+  <span>{user?.fullName || user?.username}</span>
+  <span className="navbar-role-badge">{user?.role}</span>
+</div>
         <button className="btn-logout" onClick={logout}>
           <FiLogOut />
           <span>{intl.formatMessage({ id: 'btn.logout' })}</span>

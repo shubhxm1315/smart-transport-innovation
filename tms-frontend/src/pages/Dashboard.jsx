@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  FiTruck, FiUsers, FiNavigation, FiFileText,
-  FiCheckCircle, FiActivity, FiPackage, FiBookOpen
+  FiTruck,
+  FiUsers,
+  FiNavigation,
+  FiTool,
+  FiCheckCircle,
+  FiActivity,
+  FiDroplet
 } from 'react-icons/fi';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -60,7 +65,7 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <div className="page-header">
-        <h2 className="page-title">Dashboard</h2>
+       <h2 className="page-title">TransitOps Dashboard</h2>
         <span className="auto-refresh-label">Auto-refreshes every 30s</span>
       </div>
 
@@ -71,8 +76,8 @@ function Dashboard() {
         <StatCard icon={<FiTruck />} label="Available Vehicles" value={stats.availableVehicles} color="#2196f3" />
         <StatCard icon={<FiTruck />} label="Total Vehicles" value={stats.totalVehicles} color="#1a237e" />
         <StatCard icon={<FiUsers />} label="Active Drivers" value={stats.activeDrivers} color="#4caf50" />
-        <StatCard icon={<FiFileText />} label="Total LRs" value={stats.totalLrs} color="#ff5722" />
-        <StatCard icon={<FiBookOpen />} label="Total Bookings" value={stats.totalBookings} color="#009688" />
+       <StatCard icon={<FiTool />} label="Maintenance Due" value={stats.totalLrs} color="#ff5722"/>
+      <StatCard icon={<FiDroplet />}label="Fuel Logs"value={stats.totalBookings}color="#009688"/>
       </div>
 
       {trends && (
@@ -90,7 +95,7 @@ function Dashboard() {
             </ResponsiveContainer>
           </div>
           <div className="chart-card">
-            <h3>Bookings (Last 7 Days)</h3>
+           <h3>Fuel Logs (Last 7 Days)</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={trends.bookingTrend}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -133,7 +138,7 @@ function Dashboard() {
       )}
 
       <div className="recent-section">
-        <h3>Recent Trips</h3>
+        <h3>Recent Fleet Activity</h3>
         <div className="table-container">
           <table className="data-table">
             <thead>
@@ -142,7 +147,7 @@ function Dashboard() {
                 <th>Driver</th>
                 <th>Route</th>
                 <th>Start Time</th>
-                <th>LRs</th>
+                <th>Stops</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -157,7 +162,7 @@ function Dashboard() {
                   <td><StatusBadge status={trip.status} /></td>
                 </tr>
               )) : (
-                <tr><td colSpan="6" className="empty-row">No recent trips</td></tr>
+                <tr><td colSpan="6" className="empty-row">No recent fleet activity</td></tr>
               )}
             </tbody>
           </table>

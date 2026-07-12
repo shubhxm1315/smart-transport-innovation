@@ -9,7 +9,7 @@ const I18nContext = createContext(null);
 export function I18nProvider({ children }) {
   const [locale, setLocale] = useState(() => localStorage.getItem('locale') || 'en');
 
-  const changeLocale = useCallback((newLocale) => {
+  const changeLocale =   useCallback((newLocale) => {
     setLocale(newLocale);
     localStorage.setItem('locale', newLocale);
   }, []);

@@ -1,18 +1,13 @@
 {
-  "app.title": "Transport Management System",
-  "app.short": "TMS",
+  "app.title": "TransitOps Fleet Management",
+  "app.short": "TransitOps",
+  "nav.maintenance": "Maintenance",
+  "nav.fuelLogs": "Fuel Logs",
   "nav.dashboard": "Dashboard",
   "nav.vehicles": "Vehicles",
   "nav.drivers": "Drivers",
   "nav.routes": "Routes",
   "nav.trips": "Trips",
-  "nav.bookings": "Bookings",
-  "nav.lrs": "Lorry Receipts",
-  "nav.expenses": "Expenses",
-  "nav.reports": "Reports",
-  "nav.users": "Users",
-  "nav.auditLogs": "Audit Logs",
-  "nav.webhooks": "Webhooks",
   "btn.add": "Add",
   "btn.create": "Create",
   "btn.update": "Update",
@@ -30,8 +25,8 @@
   "dashboard.availableVehicles": "Available Vehicles",
   "dashboard.totalVehicles": "Total Vehicles",
   "dashboard.activeDrivers": "Active Drivers",
-  "dashboard.totalLrs": "Total LRs",
-  "dashboard.totalBookings": "Total Bookings",
+  "dashboard.totalLrs": "Maintenance Due",
+  "dashboard.totalBookings": "Fuel Logs",
   "dashboard.recentTrips": "Recent Trips",
   "dashboard.autoRefresh": "Auto-refreshes every 30s",
   "dashboard.tripsLast7": "Trips (Last 7 Days)",
@@ -112,4 +107,3 @@
   "login.oauthGoogle": "Sign in with Google",
   "login.oauthMicrosoft": "Sign in with Microsoft"
 }
-
