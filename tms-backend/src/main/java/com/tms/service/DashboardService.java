@@ -27,14 +27,11 @@ public class DashboardService {
     private final VehicleRepository vehicleRepository;
     private final DriverRepository driverRepository;
     private final TripRepository tripRepository;
-    private final BookingRepository bookingRepository;
-    private final LorryReceiptRepository lrRepository;
     private final TripService tripService;
 
     @Transactional(readOnly = true)
     public DashboardResponse getDashboardStats() {
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
 
         return DashboardResponse.builder()
                 .totalTrips(tripRepository.count())
@@ -44,9 +41,6 @@ public class DashboardService {
                 .totalVehicles(vehicleRepository.count())
                 .totalDrivers(driverRepository.count())
                 .activeDrivers(driverRepository.countByStatus(DriverStatus.ACTIVE))
-                .totalLrs(lrRepository.count())
-                .todayBookings(bookingRepository.countBookingsInDateRange(startOfDay, endOfDay))
-                .totalBookings(bookingRepository.count())
                 .recentTrips(tripService.getRecentTrips())
                 .build();
     }
@@ -57,7 +51,6 @@ public class DashboardService {
         LocalDate today = LocalDate.now();
 
         List<DashboardTrendResponse.TrendPoint> tripTrend = new ArrayList<>();
-        List<DashboardTrendResponse.TrendPoint> bookingTrend = new ArrayList<>();
 
         for (int i = 6; i >= 0; i--) {
             LocalDate date = today.minusDays(i);
@@ -66,10 +59,8 @@ public class DashboardService {
             String label = date.format(fmt);
 
             long tripCount = tripRepository.countByCreatedAtBetween(dayStart, dayEnd);
-            long bookingCount = bookingRepository.countBookingsInDateRange(dayStart, dayEnd);
 
             tripTrend.add(new DashboardTrendResponse.TrendPoint(label, tripCount));
-            bookingTrend.add(new DashboardTrendResponse.TrendPoint(label, bookingCount));
         }
 
         Map<String, Long> tripsByStatus = new LinkedHashMap<>();
@@ -84,7 +75,6 @@ public class DashboardService {
 
         return DashboardTrendResponse.builder()
                 .tripTrend(tripTrend)
-                .bookingTrend(bookingTrend)
                 .tripsByStatus(tripsByStatus)
                 .vehiclesByStatus(vehiclesByStatus)
                 .build();

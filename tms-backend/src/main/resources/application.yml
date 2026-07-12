@@ -1,6 +1,7 @@
 spring:
   application:
-    name: tms-backend
+    name: transitops
+
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
@@ -11,7 +12,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        'format_sql': true
 
   flyway:
     enabled: ${FLYWAY_ENABLED:false}
@@ -21,11 +22,14 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:noreply@tms.com}
+    username: ${MAIL_USERNAME:noreply@transitops.com}
     password: ${MAIL_PASSWORD:}
     properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
   security:
     oauth2:
@@ -34,16 +38,24 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID:placeholder}
             client-secret: ${GOOGLE_CLIENT_SECRET:placeholder}
-            scope: openid, email, profile
+            scope:
+              - openid
+              - email
+              - profile
             redirect-uri: "{baseUrl}/api/v1/auth/oauth2/callback/{registrationId}"
+
           microsoft:
             client-id: ${MICROSOFT_CLIENT_ID:placeholder}
             client-secret: ${MICROSOFT_CLIENT_SECRET:placeholder}
-            scope: openid, email, profile
+            scope:
+              - openid
+              - email
+              - profile
             redirect-uri: "{baseUrl}/api/v1/auth/oauth2/callback/{registrationId}"
             client-name: Microsoft
             authorization-grant-type: authorization_code
             provider: microsoft
+
         provider:
           microsoft:
             authorization-uri: https://login.microsoftonline.com/common/oauth2/v2.0/authorize
@@ -58,18 +70,22 @@ server:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+
   jwt:
     secret: ${JWT_SECRET:Y2hhbmdlLXRoaXMtaW4tcHJvZHVjdGlvbi10by1hLXNlY3VyZS1yYW5kb20ta2V5LWF0LWxlYXN0LTI1Ni1iaXRz}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
     refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+
   email:
     enabled: ${EMAIL_ENABLED:false}
+
   oauth2:
     frontend-redirect-url: ${OAUTH2_FRONTEND_REDIRECT_URL:http://localhost:3000/oauth2/callback}
 
 springdoc:
   api-docs:
     path: /v3/api-docs
+
   swagger-ui:
     path: /swagger-ui.html
     operations-sorter: method
@@ -77,6 +93,7 @@ springdoc:
 logging:
   level:
     root: INFO
-    com.tms: ${LOG_LEVEL:INFO}
+    'com.tms': ${LOG_LEVEL:INFO}
+
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

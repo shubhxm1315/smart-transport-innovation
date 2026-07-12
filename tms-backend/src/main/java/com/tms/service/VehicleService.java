@@ -6,7 +6,6 @@ import com.tms.entity.Vehicle;
 import com.tms.enums.TripStatus;
 import com.tms.enums.VehicleStatus;
 import com.tms.enums.VehicleType;
-import com.tms.enums.AuditAction;
 import com.tms.exception.BadRequestException;
 import com.tms.exception.DuplicateResourceException;
 import com.tms.exception.ResourceNotFoundException;
@@ -30,7 +29,6 @@ public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
     private final TripRepository tripRepository;
-    private final AuditLogService auditLogService;
 
     @Transactional(readOnly = true)
     public Page<VehicleResponse> getAllVehicles(int page, int size, VehicleType type, VehicleStatus status) {
@@ -70,7 +68,6 @@ public class VehicleService {
         Vehicle saved = vehicleRepository.save(vehicle);
         log.info("Vehicle created: {} ({})", saved.getVehicleNumber(), saved.getId());
         VehicleResponse response = toResponse(saved);
-        auditLogService.log("Vehicle", saved.getId().toString(), AuditAction.CREATE, null, response);
         return response;
     }
 

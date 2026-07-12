@@ -5,7 +5,6 @@ import com.tms.dto.response.DriverResponse;
 import com.tms.entity.Driver;
 import com.tms.enums.DriverStatus;
 import com.tms.enums.TripStatus;
-import com.tms.enums.AuditAction;
 import com.tms.exception.BadRequestException;
 import com.tms.exception.DuplicateResourceException;
 import com.tms.exception.ResourceNotFoundException;
@@ -29,7 +28,6 @@ public class DriverService {
 
     private final DriverRepository driverRepository;
     private final TripRepository tripRepository;
-    private final AuditLogService auditLogService;
 
     @Transactional(readOnly = true)
     public Page<DriverResponse> getAllDrivers(int page, int size, DriverStatus status, String name) {
@@ -66,7 +64,6 @@ public class DriverService {
         Driver saved = driverRepository.save(driver);
         log.info("Driver created: {} ({})", saved.getName(), saved.getId());
         DriverResponse response = toResponse(saved);
-        auditLogService.log("Driver", saved.getId().toString(), AuditAction.CREATE, null, response);
         return response;
     }
 

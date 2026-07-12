@@ -12,7 +12,6 @@ import java.util.Map;
 @Builder
 public class DashboardTrendResponse {
     private List<TrendPoint> tripTrend;
-    private List<TrendPoint> bookingTrend;
     private Map<String, Long> tripsByStatus;
     private Map<String, Long> vehiclesByStatus;
 

@@ -3,19 +3,16 @@ package com.tms.service;
 import com.tms.dto.request.TripRequest;
 import com.tms.dto.response.TripResponse;
 import com.tms.entity.Driver;
-import com.tms.entity.LorryReceipt;
 import com.tms.entity.Route;
 import com.tms.entity.Trip;
 import com.tms.entity.Vehicle;
 import com.tms.enums.DriverStatus;
 import com.tms.enums.TripStatus;
 import com.tms.enums.VehicleStatus;
-import com.tms.enums.AuditAction;
-import com.tms.enums.WebhookEventType;
+// import com.tms.enums.WebhookEventType; // unused
 import com.tms.enums.NotificationType;
 import com.tms.exception.BadRequestException;
 import com.tms.exception.ResourceNotFoundException;
-import com.tms.repository.LorryReceiptRepository;
 import com.tms.repository.TripRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
+// import java.util.ArrayList; // unused
+// import java.util.Collections; // unused
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +36,10 @@ import java.util.UUID;
 public class TripService {
 
     private final TripRepository tripRepository;
-    private final LorryReceiptRepository lrRepository;
     private final VehicleService vehicleService;
     private final DriverService driverService;
     private final RouteService routeService;
-    private final AuditLogService auditLogService;
     private final EmailService emailService;
-    private final WebhookDispatchService webhookDispatchService;
     private final NotificationService notificationService;
     private final com.tms.repository.UserRepository userRepository;
 
@@ -92,7 +86,6 @@ public class TripService {
             throw new BadRequestException("Driver is already assigned to an active trip");
         }
 
-        List<LorryReceipt> lrs = resolveLrs(request.getLrIds());
 
         Route route = request.getRouteId() != null ? routeService.findById(request.getRouteId()) : null;
 
@@ -104,7 +97,6 @@ public class TripService {
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .notes(request.getNotes())
-                .lorryReceipts(lrs)
                 .build();
 
         // Mark vehicle as busy
@@ -113,8 +105,6 @@ public class TripService {
         Trip saved = tripRepository.save(trip);
         log.info("Trip created: {} vehicle={} driver={}", saved.getId(), vehicle.getVehicleNumber(), driver.getName());
         TripResponse response = toResponse(saved);
-        auditLogService.log("Trip", saved.getId().toString(), AuditAction.CREATE, null, response);
-        webhookDispatchService.dispatch(WebhookEventType.TRIP_CREATED, response);
         return response;
     }
 
@@ -150,7 +140,6 @@ public class TripService {
             }
         }
 
-        List<LorryReceipt> lrs = resolveLrs(request.getLrIds());
 
         Route route = request.getRouteId() != null ? routeService.findById(request.getRouteId()) : null;
 
@@ -160,7 +149,6 @@ public class TripService {
         trip.setStartTime(request.getStartTime());
         trip.setEndTime(request.getEndTime());
         trip.setNotes(request.getNotes());
-        trip.setLorryReceipts(lrs);
 
         return toResponse(tripRepository.save(trip));
     }
@@ -184,9 +172,7 @@ public class TripService {
         }
 
         TripResponse response = toResponse(tripRepository.save(trip));
-        auditLogService.log("Trip", id.toString(), AuditAction.UPDATE, currentStatus.name(), newStatus.name());
         emailService.sendTripStatusUpdate(trip, currentStatus.name());
-        webhookDispatchService.dispatch(WebhookEventType.TRIP_STATUS_CHANGED, response);
 
         // Push in-app notification to all dispatchers about the status change
         userRepository.findAll().stream()
@@ -244,42 +230,24 @@ public class TripService {
         }
     }
 
-    private List<LorryReceipt> resolveLrs(List<UUID> lrIds) {
-        if (lrIds == null || lrIds.isEmpty()) return new ArrayList<>();
-        List<LorryReceipt> lrs = lrRepository.findAllById(lrIds);
-        if (lrs.size() != lrIds.size()) {
-            throw new BadRequestException("One or more Lorry Receipt IDs are invalid");
-        }
-        return lrs;
-    }
+   
 
-    TripResponse toResponse(Trip t) {
-        List<TripResponse.LrSummary> lrSummaries = t.getLorryReceipts() != null
-                ? t.getLorryReceipts().stream().map(lr -> TripResponse.LrSummary.builder()
-                        .id(lr.getId())
-                        .lrNumber(lr.getLrNumber())
-                        .origin(lr.getOrigin())
-                        .destination(lr.getDestination())
-                        .status(lr.getStatus().name())
-                        .build()).toList()
-                : Collections.emptyList();
-
-        return TripResponse.builder()
-                .id(t.getId())
-                .vehicleId(t.getVehicle().getId())
-                .vehicleNumber(t.getVehicle().getVehicleNumber())
-                .driverId(t.getDriver().getId())
-                .driverName(t.getDriver().getName())
-                .routeId(t.getRoute() != null ? t.getRoute().getId() : null)
-                .routeOrigin(t.getRoute() != null ? t.getRoute().getOrigin() : null)
-                .routeDestination(t.getRoute() != null ? t.getRoute().getDestination() : null)
-                .routeDistance(t.getRoute() != null ? t.getRoute().getDistance() : null)
-                .status(t.getStatus())
-                .startTime(t.getStartTime())
-                .endTime(t.getEndTime())
-                .notes(t.getNotes())
-                .lorryReceipts(lrSummaries)
-                .createdAt(t.getCreatedAt())
-                .build();
-    }
+   TripResponse toResponse(Trip t) {
+    return TripResponse.builder()
+            .id(t.getId())
+            .vehicleId(t.getVehicle().getId())
+            .vehicleNumber(t.getVehicle().getVehicleNumber())
+            .driverId(t.getDriver().getId())
+            .driverName(t.getDriver().getName())
+            .routeId(t.getRoute() != null ? t.getRoute().getId() : null)
+            .routeOrigin(t.getRoute() != null ? t.getRoute().getOrigin() : null)
+            .routeDestination(t.getRoute() != null ? t.getRoute().getDestination() : null)
+            .routeDistance(t.getRoute() != null ? t.getRoute().getDistance() : null)
+            .status(t.getStatus())
+            .startTime(t.getStartTime())
+            .endTime(t.getEndTime())
+            .notes(t.getNotes())
+            .createdAt(t.getCreatedAt())
+            .build();
+}
 }

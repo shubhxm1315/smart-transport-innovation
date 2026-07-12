@@ -13,33 +13,62 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TripRepository extends JpaRepository<Trip, UUID> {
+
     List<Trip> findByStatus(TripStatus status);
+
     List<Trip> findByDriverId(UUID driverId);
+
     List<Trip> findByVehicleId(UUID vehicleId);
+
     long countByStatus(TripStatus status);
 
-    @Query("SELECT t FROM Trip t ORDER BY t.createdAt DESC LIMIT 10")
-    List<Trip> findRecentTrips();
+    @Query("SELECT t FROM Trip t ORDER BY t.createdAt DESC")
+    List<Trip> findRecentTrips(Pageable pageable);
 
     boolean existsByVehicleIdAndStatusIn(UUID vehicleId, List<TripStatus> statuses);
-    boolean existsByDriverIdAndStatusIn(UUID driverId, List<TripStatus> statuses);
-    boolean existsByLorryReceiptsId(UUID lrId);
 
-    @Query("SELECT t FROM Trip t WHERE " +
-            "(:status IS NULL OR t.status = :status) AND " +
-            "(:startFrom IS NULL OR t.startTime >= :startFrom) AND " +
-            "(:startTo IS NULL OR t.startTime <= :startTo)")
+    boolean existsByDriverIdAndStatusIn(UUID driverId, List<TripStatus> statuses);
+
+    @Query("""
+            SELECT t FROM Trip t
+            WHERE (:status IS NULL OR t.status = :status)
+              AND (:startFrom IS NULL OR t.startTime >= :startFrom)
+              AND (:startTo IS NULL OR t.startTime <= :startTo)
+            """)
     Page<Trip> findWithFilters(
             @Param("status") TripStatus status,
             @Param("startFrom") LocalDateTime startFrom,
             @Param("startTo") LocalDateTime startTo,
-            Pageable pageable);
+            Pageable pageable
+    );
 
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
-    @Query("SELECT t FROM Trip t JOIN FETCH t.route WHERE t.vehicle.id = :vehicleId AND t.status = 'COMPLETED' AND t.route IS NOT NULL AND t.endTime BETWEEN :from AND :to")
-    List<Trip> findCompletedTripsWithRouteByVehicle(@Param("vehicleId") UUID vehicleId, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+    @Query("""
+            SELECT t
+            FROM Trip t
+            JOIN FETCH t.route
+            WHERE t.vehicle.id = :vehicleId
+              AND t.status = 'COMPLETED'
+              AND t.route IS NOT NULL
+              AND t.endTime BETWEEN :from AND :to
+            """)
+    List<Trip> findCompletedTripsWithRouteByVehicle(
+            @Param("vehicleId") UUID vehicleId,
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
+    );
 
-    @Query("SELECT t FROM Trip t JOIN FETCH t.route WHERE t.status = 'COMPLETED' AND t.route IS NOT NULL AND t.endTime BETWEEN :from AND :to")
-    List<Trip> findCompletedTripsWithRouteInRange(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+    @Query("""
+            SELECT t
+            FROM Trip t
+            JOIN FETCH t.route
+            WHERE t.status = 'COMPLETED'
+              AND t.route IS NOT NULL
+              AND t.endTime BETWEEN :from AND :to
+            """)
+    List<Trip> findCompletedTripsWithRouteInRange(
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
+    );
 }

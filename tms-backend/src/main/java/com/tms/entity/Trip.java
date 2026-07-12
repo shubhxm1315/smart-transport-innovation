@@ -6,16 +6,16 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "trips", indexes = {
         @Index(name = "idx_trip_status", columnList = "status")
 })
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder
 public class Trip extends Auditable {
 
@@ -44,15 +44,6 @@ public class Trip extends Auditable {
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "trip_lrs",
-            joinColumns = @JoinColumn(name = "trip_id"),
-            inverseJoinColumns = @JoinColumn(name = "lr_id")
-    )
-    @Builder.Default
-    private List<LorryReceipt> lorryReceipts = new ArrayList<>();
 
     @Column(length = 500)
     private String notes;
